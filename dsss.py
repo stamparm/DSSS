@@ -34,11 +34,11 @@ DBMS_ERRORS = {
 def retrieveContent(url):
     retVal = {HTTPCODE : httplib.OK}
     try:
-        retVal[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read()
+        retVal[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read() # replacing space with %20 is a dirty fix for urllib2
     except Exception, e:
-        retVal[HTML] = e.read() if hasattr(e, 'read') else ""
-        retVal[HTML] = e.msg if hasattr(e, 'msg') else retVal[HTML] or ""
-        retVal[HTTPCODE] = e.code if hasattr(e, 'code') else None
+        retVal[HTML] = e.read() if hasattr(e, "read") else ""
+        retVal[HTML] = e.msg if hasattr(e, "msg") else retVal[HTML] or ""
+        retVal[HTTPCODE] = e.code if hasattr(e, "code") else None
     match = re.search(r"<title>(?P<title>[^<]+)</title>", retVal[HTML])
     retVal[TITLE] = match.group("title") if match else ""
     retVal[TEXT] = re.sub(r"(?s)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s", " ", retVal[HTML])
