@@ -80,8 +80,8 @@ def scanPage(url):
                                 if any(map(lambda x: original[x] == contents[True][x] != contents[False][x], [HTTPCODE, TITLE])) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
                                     vulnerable = True
                                 else:
-                                    ratios = map(lambda x: difflib.SequenceMatcher(None, original[TEXT], x).quick_ratio(), [contents[True][TEXT], contents[False][TEXT]])
-                                    vulnerable = ratios[0] > FUZZY_THRESHOLD and ratios[1] < FUZZY_THRESHOLD
+                                    ratios = dict([(x, difflib.SequenceMatcher(None, original[TEXT], contents[x][TEXT]).quick_ratio()) for x in (True, False))
+                                    vulnerable = ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
                                 if vulnerable:
                                     print " (i) parameter '%s' appears to be SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
                                     retVal = True
