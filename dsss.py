@@ -67,24 +67,24 @@ def scanPage(url):
                     if not vulnerable and re.search(regex, content[HTML], re.I):
                         print " (o) parameter '%s' could be error SQLi vulnerable! (%s error message)" % (match.group("parameter"), dbms)
                         retVal = vulnerable = True
-            if not vulnerable:
-                original = retrieveContent(link)
-                a, b = random.randint(MINVAL, MAXVAL), random.randint(MINVAL, MAXVAL)
-                for prefix in PREFIXES:
-                    for boolean in BOOLEAN_TESTS:
-                        for suffix in SUFFIXES:
-                            if not vulnerable:
-                                template = "%s%s%s" % (prefix, boolean, suffix)
-                                payloads = dict([(x, link.replace(match.group(0), match.group(0) + (template % (a, a if x else b)))) for x in (True, False)])
-                                contents = dict([(x, retrieveContent(payloads[x])) for x in (True, False)])
-                                if any(map(lambda x: original[x] == contents[True][x] != contents[False][x], [HTTPCODE, TITLE])) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
-                                    vulnerable = True
-                                else:
-                                    ratios = dict([(x, difflib.SequenceMatcher(None, original[TEXT], contents[x][TEXT]).quick_ratio()) for x in (True, False)])
-                                    vulnerable = ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
-                                if vulnerable:
-                                    print " (i) parameter '%s' appears to be blind SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
-                                    retVal = True
+            vulnerable = False
+            original = retrieveContent(link)
+            a, b = random.randint(MINVAL, MAXVAL), random.randint(MINVAL, MAXVAL)
+            for prefix in PREFIXES:
+                for boolean in BOOLEAN_TESTS:
+                    for suffix in SUFFIXES:
+                        if not vulnerable:
+                            template = "%s%s%s" % (prefix, boolean, suffix)
+                            payloads = dict([(x, link.replace(match.group(0), match.group(0) + (template % (a, a if x else b)))) for x in (True, False)])
+                            contents = dict([(x, retrieveContent(payloads[x])) for x in (True, False)])
+                            if any(map(lambda x: original[x] == contents[True][x] != contents[False][x], [HTTPCODE, TITLE])) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
+                                vulnerable = True
+                            else:
+                                ratios = dict([(x, difflib.SequenceMatcher(None, original[TEXT], contents[x][TEXT]).quick_ratio()) for x in (True, False)])
+                                vulnerable = ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
+                            if vulnerable:
+                                print " (i) parameter '%s' appears to be blind SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
+                                retVal = True
     return retVal
 
 if __name__ == "__main__":
