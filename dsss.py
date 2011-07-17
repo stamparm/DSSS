@@ -13,7 +13,7 @@ PREFIXES = [" ", ") ", "' ", "') "]             # prefix values used for buildin
 SUFFIXES = ["", "-- ", "#"]                     # suffix values used for building testing blind payloads
 BOOLEAN_TESTS = ["AND %d=%d", "OR NOT (%d=%d)"] # boolean tests used for building testing blind payloads
 TEXT, HTTPCODE, TITLE, HTML = range(4)          # enumerator-like values used for marking content type
-MINVAL, MAXVAL = 100, 255                       # minimum and maximum range values used in blind tests
+MINVAL, MAXVAL = 100, 255                       # minimum and maximum range values used in boolean tests
 FUZZY_THRESHOLD = 0.95                          # value in range (0,1) for distinguishing True from False responses
 
 DBMS_ERRORS = {
