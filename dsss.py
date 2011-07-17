@@ -75,8 +75,8 @@ def scanPage(url):
                         for suffix in SUFFIXES:
                             if not vulnerable:
                                 template = "%s%s%s" % (prefix, boolean, suffix)
-                                payloads = {True: link.replace(match.group(0), match.group(0) + (template % (a, a))), False: link.replace(match.group(0), match.group(0) + (template % (a, b)))}
-                                contents = {True: retrieveContent(payloads[True]), False: retrieveContent(payloads[False])}
+                                payloads = dict([(x, link.replace(match.group(0), match.group(0) + (template % (a, a if x else b)))) for x in (True, False)])
+                                contents = dict([(x, retrieveContent(payloads[x])) for x in (True, False)])
                                 if any(map(lambda x: original[x] == contents[True][x] != contents[False][x], [HTTPCODE, TITLE])) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
                                     vulnerable = True
                                 else:
