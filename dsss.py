@@ -34,7 +34,7 @@ DBMS_ERRORS = {
 def retrieveContent(url):
     retVal = {HTTPCODE : httplib.OK}
     try:
-        retVal[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read() # replacing space with %20 is a dirty fix for urllib2
+        retVal[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read() # replacing ' ' with %20 is a quick/dirty fix for urllib2
     except Exception, e:
         retVal[HTML] = e.read() if hasattr(e, "read") else ""
         retVal[HTML] = e.msg if hasattr(e, "msg") else retVal[HTML] or ""
@@ -65,7 +65,7 @@ def scanPage(url):
             for dbms in DBMS_ERRORS:
                 for regex in DBMS_ERRORS[dbms]:
                     if not vulnerable and re.search(regex, content[HTML], re.I):
-                        print " (o) parameter '%s' could be SQLi vulnerable! (%s error message)" % (match.group('parameter'), dbms)
+                        print " (o) parameter '%s' could be SQLi vulnerable! (%s error message)" % (match.group("parameter"), dbms)
                         retVal = vulnerable = True
             if not vulnerable:
                 original = retrieveContent(link)
@@ -83,7 +83,7 @@ def scanPage(url):
                                     ratios = map(lambda x: difflib.SequenceMatcher(None, original[TEXT], x).quick_ratio(), [contents[True][TEXT], contents[False][TEXT]])
                                     vulnerable = ratios[0] > FUZZY_THRESHOLD and ratios[1] < FUZZY_THRESHOLD
                                 if vulnerable:
-                                    print " (i) parameter '%s' appears to be SQLi vulnerable! (\"%s\")" % (match.group('parameter'), payloads[True])
+                                    print " (i) parameter '%s' appears to be SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
                                     retVal = True
     return retVal
 
