@@ -6,7 +6,7 @@ NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code)"
 VERSION = "0.1c"
 AUTHOR  = "Miroslav Stampar (http://unconciousmind.blogspot.com | @stamparm)"
 LICENSE = "GPLv2 (www.gnu.org/licenses/gpl-2.0.html)"
-NOTE    = "This is a fully working PoC proving that commercial (SQLi) scanners can be beaten under 100 lines of code (blind, error, depth 1 crawler)"
+NOTE    = "This is a fully working PoC proving that commercial (SQLi) scanners can be beaten under 100 lines of code (blind, error, depth 1 crawler, comparisons: titles/fuzzy filtered text only/HTTP codes/page lengths)"
 
 INVALID_SQL_CHAR_POOL = ['(',')','\'','"']      # characters used for SQL poisoning of parameter values
 PREFIXES = [" ", ") ", "' ", "') "]             # prefix values used for building testing blind payloads
