@@ -65,7 +65,7 @@ def scanPage(url):
             for dbms in DBMS_ERRORS:
                 for regex in DBMS_ERRORS[dbms]:
                     if not vulnerable and re.search(regex, content[HTML], re.I):
-                        print " (o) parameter '%s' could be SQLi vulnerable! (%s error message)" % (match.group("parameter"), dbms)
+                        print " (o) parameter '%s' could be error SQLi vulnerable! (%s error message)" % (match.group("parameter"), dbms)
                         retVal = vulnerable = True
             if not vulnerable:
                 original = retrieveContent(link)
@@ -83,7 +83,7 @@ def scanPage(url):
                                     ratios = dict([(x, difflib.SequenceMatcher(None, original[TEXT], contents[x][TEXT]).quick_ratio()) for x in (True, False)])
                                     vulnerable = ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
                                 if vulnerable:
-                                    print " (i) parameter '%s' appears to be SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
+                                    print " (i) parameter '%s' appears to be blind SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
                                     retVal = True
     return retVal
 
