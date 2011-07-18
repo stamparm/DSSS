@@ -36,8 +36,8 @@ def retrieve_content(url):
         retval[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read() # replacing ' ' with %20 is a quick/dirty fix for urllib2
     except Exception, ex:
         print " (x) exception occured ('%s')" % ex
-        retval[HTML] = ex.read() if hasattr(ex, "read") else ""
-        retval[HTML] = ex.msg if hasattr(ex, "msg") else retval[HTML] or ""
+        retval[HTML] = ex.msg if hasattr(ex, "msg") else ""
+        retval[HTML] = ex.read() if hasattr(ex, "read") else retval[HTML]
         retval[HTTPCODE] = ex.code if hasattr(ex, "code") else None
     match = re.search(r"<title>(?P<title>[^<]+)</title>", retval[HTML], re.I)
     retval[TITLE] = match.group("title") if match else ""
