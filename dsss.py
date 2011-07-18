@@ -39,9 +39,9 @@ def retrieveContent(url):
         retVal[HTML] = e.read() if hasattr(e, "read") else ""
         retVal[HTML] = e.msg if hasattr(e, "msg") else retVal[HTML] or ""
         retVal[HTTPCODE] = e.code if hasattr(e, "code") else None
-    match = re.search(r"<title>(?P<title>[^<]+)</title>", retVal[HTML])
+    match = re.search(r"<title>(?P<title>[^<]+)</title>", retVal[HTML], re.I)
     retVal[TITLE] = match.group("title") if match else ""
-    retVal[TEXT] = re.sub(r"(?s)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s", " ", retVal[HTML])
+    retVal[TEXT] = re.sub(r"<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s", " ", retVal[HTML], re.I|re.M)
     retVal[TEXT] = re.sub(r"\s{2,}", " ", retVal[TEXT])
     return retVal
 
