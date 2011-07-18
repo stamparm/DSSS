@@ -31,7 +31,7 @@ DBMS_ERRORS = {
 }
 
 def retrieve_content(url):
-    retval = {HTTPCODE: httplib.OK, HTML: ""}
+    retval = {HTTPCODE: httplib.OK}
     try:
         retval[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read() # replacing ' ' with %20 is a quick/dirty fix for urllib2
     except Exception, ex:
@@ -40,12 +40,12 @@ def retrieve_content(url):
         retval[HTML] = ex.read() if hasattr(ex, "read") else retval[HTML]
         retval[HTTPCODE] = ex.code if hasattr(ex, "code") else None
     match = re.search(r"<title>(?P<title>[^<]+?)</title>", retval[HTML], re.I)
-    retval[TITLE] = match.group("title") if match else ""
+    retval[TITLE] = match.group("title") if match else None
     retval[TEXT] = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s+", " ", retval[HTML])
     return retval
 
 def shallow_crawl(url):
-    print "* crawling for links at given target url"
+    print "* crawling for links at the given target url"
     retval = set([url])
     page = retrieve_content(url)[HTML]
     for match in re.finditer(r"href\s*=\s*\"(?P<href>[^\"]+)\"", page, re.I):
