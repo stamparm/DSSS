@@ -39,10 +39,9 @@ def retrieve_content(url):
         retval[HTML] = ex.msg if hasattr(ex, "msg") else ""
         retval[HTML] = ex.read() if hasattr(ex, "read") else retval[HTML]
         retval[HTTPCODE] = ex.code if hasattr(ex, "code") else None
-    match = re.search(r"<title>(?P<title>[^<]+)</title>", retval[HTML], re.I)
+    match = re.search(r"<title>(?P<title>[^<]+?)</title>", retval[HTML], re.I)
     retval[TITLE] = match.group("title") if match else ""
-    retval[TEXT] = re.sub(r"<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s", " ", retval[HTML], re.I|re.M)
-    retval[TEXT] = re.sub(r"\s{2,}", " ", retval[TEXT])
+    retval[TEXT] = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s+", " ", retval[HTML])
     return retval
 
 def shallow_crawl(url):
