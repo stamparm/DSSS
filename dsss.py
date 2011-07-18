@@ -45,6 +45,7 @@ def retrieve_content(url):
     return retval
 
 def shallow_crawl(url):
+    print "* crawling for links at given target url"
     retval = set([url])
     page = retrieve_content(url)[HTML]
     for match in re.finditer(r"href\s*=\s*\"(?P<href>[^\"]+)\"", page, re.I):
