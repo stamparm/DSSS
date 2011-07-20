@@ -3,7 +3,7 @@
 import difflib, httplib, optparse, random, re, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code)"
-VERSION = "0.1d"
+VERSION = "0.1e"
 AUTHOR  = "Miroslav Stampar (http://unconciousmind.blogspot.com | @stamparm)"
 LICENSE = "GPLv2 (www.gnu.org/licenses/gpl-2.0.html)"
 
@@ -35,7 +35,6 @@ def retrieve_content(url):
     try:
         retval[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read() # replacing ' ' with %20 is a quick/dirty fix for urllib2
     except Exception, ex:
-        print " (x) exception occured ('%s')" % ex
         retval[HTML] = ex.msg if hasattr(ex, "msg") else ""
         retval[HTML] = ex.read() if hasattr(ex, "read") else retval[HTML]
         retval[HTTPCODE] = ex.code if hasattr(ex, "code") else None
