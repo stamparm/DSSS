@@ -3,9 +3,9 @@
 import difflib, httplib, optparse, random, re, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code)"
-VERSION = "0.1e"
+VERSION = "0.1f"
 AUTHOR  = "Miroslav Stampar (http://unconciousmind.blogspot.com | @stamparm)"
-LICENSE = "GPLv2 (www.gnu.org/licenses/gpl-2.0.html)"
+LICENSE = "Public domain (FREE)"
 
 INVALID_SQL_CHAR_POOL = ['(', ')', '\'', '"']   # characters used for SQL poisoning of parameter values
 PREFIXES = [" ", ") ", "' ", "') "]             # prefix values used for building testing blind payloads
@@ -35,9 +35,9 @@ def retrieve_content(url):
     try:
         retval[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read() # replacing ' ' with %20 is a quick/dirty fix for urllib2
     except Exception, ex:
-        retval[HTML] = ex.msg if hasattr(ex, "msg") else ""
+        retval[HTTPCODE] = getattr(ex, "code", None)
+        retval[HTML] = getattr(ex, "msg", str())
         retval[HTML] = ex.read() if hasattr(ex, "read") else retval[HTML]
-        retval[HTTPCODE] = ex.code if hasattr(ex, "code") else None
     match = re.search(r"<title>(?P<title>[^<]+?)</title>", retval[HTML], re.I)
     retval[TITLE] = match.group("title") if match else None
     retval[TEXT] = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s+", " ", retval[HTML])
@@ -46,8 +46,7 @@ def retrieve_content(url):
 def shallow_crawl(url):
     print "* crawling for links at the given target url"
     retval = set([url])
-    page = retrieve_content(url)[HTML]
-    for match in re.finditer(r"href\s*=\s*\"(?P<href>[^\"]+)\"", page, re.I):
+    for match in re.finditer(r"href\s*=\s*\"(?P<href>[^\"]+)\"", retrieve_content(url)[HTML], re.I):
         link = urlparse.urljoin(url, match.group("href"))
         if reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, link])):
             retval.add(link)
@@ -55,41 +54,43 @@ def shallow_crawl(url):
 
 def scan_page(url):
     retval = False
-    for link in shallow_crawl(url):
-        print "* scanning: %s%s" % (link, " (no GET parameters)" if '?' not in link else "")
-        for match in re.finditer(r"(?:[?&;])((?P<parameter>\w+)=[^&;]+)", link):
-            vulnerable = False
-            tampered = link.replace(match.group(0), match.group(0) + "".join(random.sample(INVALID_SQL_CHAR_POOL, len(INVALID_SQL_CHAR_POOL))))
-            content = retrieve_content(tampered)
-            for dbms in DBMS_ERRORS:
-                for regex in DBMS_ERRORS[dbms]:
-                    if not vulnerable and re.search(regex, content[HTML], re.I):
-                        print " (o) parameter '%s' could be error SQLi vulnerable! (%s error message)" % (match.group("parameter"), dbms)
-                        retval = vulnerable = True
-            vulnerable = False
-            original = retrieve_content(link)
-            left, right = random.randint(MIN_BOOL_VAL, MAX_BOOL_VAL), random.randint(MIN_BOOL_VAL, MAX_BOOL_VAL)
-            for prefix in PREFIXES:
-                for boolean in BOOLEAN_TESTS:
-                    for suffix in SUFFIXES:
-                        if not vulnerable:
-                            template = "%s%s%s" % (prefix, boolean, suffix)
-                            payloads = dict([(x, link.replace(match.group(0), match.group(0) + (template % (left, left if x else right)))) for x in (True, False)])
-                            contents = dict([(x, retrieve_content(payloads[x])) for x in (True, False)])
-                            if any(map(lambda x: original[x] == contents[True][x] != contents[False][x], [HTTPCODE, TITLE])) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
-                                vulnerable = True
-                            else:
-                                ratios = dict([(x, difflib.SequenceMatcher(None, original[TEXT], contents[x][TEXT]).quick_ratio()) for x in (True, False)])
-                                vulnerable = ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
-                            if vulnerable:
-                                print " (i) parameter '%s' appears to be blind SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
-                                retval = True
+    try:
+        for link in shallow_crawl(url):
+            print "* scanning: %s%s" % (link, " (no GET parameters)" if '?' not in link else "")
+            for match in re.finditer(r"(?:[?&;])((?P<parameter>\w+)=[^&;]+)", link):
+                vulnerable = False
+                tampered = link.replace(match.group(0), match.group(0) + "".join(random.sample(INVALID_SQL_CHAR_POOL, len(INVALID_SQL_CHAR_POOL))))
+                content = retrieve_content(tampered)
+                for dbms in DBMS_ERRORS:
+                    for regex in DBMS_ERRORS[dbms]:
+                        if not vulnerable and re.search(regex, content[HTML], re.I):
+                            print " (o) parameter '%s' could be error SQLi vulnerable! (%s error message)" % (match.group("parameter"), dbms)
+                            retval = vulnerable = True
+                vulnerable = False
+                original = retrieve_content(link)
+                left, right = random.randint(MIN_BOOL_VAL, MAX_BOOL_VAL), random.randint(MIN_BOOL_VAL, MAX_BOOL_VAL)
+                for prefix in PREFIXES:
+                    for boolean in BOOLEAN_TESTS:
+                        for suffix in SUFFIXES:
+                            if not vulnerable:
+                                template = "%s%s%s" % (prefix, boolean, suffix)
+                                payloads = dict([(x, link.replace(match.group(0), match.group(0) + (template % (left, left if x else right)))) for x in (True, False)])
+                                contents = dict([(x, retrieve_content(payloads[x])) for x in (True, False)])
+                                if any(map(lambda x: original[x] == contents[True][x] != contents[False][x], [HTTPCODE, TITLE])) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
+                                    vulnerable = True
+                                else:
+                                    ratios = dict([(x, difflib.SequenceMatcher(None, original[TEXT], contents[x][TEXT]).quick_ratio()) for x in (True, False)])
+                                    vulnerable = ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
+                                if vulnerable:
+                                    print " (i) parameter '%s' appears to be blind SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
+                                    retval = True
+    except KeyboardInterrupt:
+        print "\n (x) Ctrl-C was pressed"
     return retval
 
 if __name__ == "__main__":
     print "%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)
-    parser = optparse.OptionParser(version=VERSION)
-    parser.add_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.target.com/page.htm?id=1\")")
+    parser = optparse.OptionParser(version=VERSION, option_list=[optparse.make_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.target.com/page.htm?id=1\")")])
     options, _ = parser.parse_args()
     if options.url:
         result = scan_page(options.url if options.url.startswith("http") else "http://%s" % options.url)
