@@ -2,5 +2,6 @@ Damn Small SQLi Scanner (DSSS) has been made as a PoC where I wanted to show tha
 
 It supports blind/error SQLi tests, depth 1 crawling and advanced comparison of different response attributes to distinguish blind responses. If you are satisfied with your commercial tool scanning results then I believe that you could even be more satisfied with this one.
 
-Currently only GET parameters are supported as of code line restrictions.
+Currently only GET parameters are supported as of code line restrictions (<100 LOC).
 
+p.s. Python v2.5.x-v2.7.x is recommended for running this tool
