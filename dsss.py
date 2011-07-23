@@ -17,7 +17,7 @@ FUZZY_THRESHOLD = 0.95                          # ratio value in range (0,1) use
 
 DBMS_ERRORS = {
     "MySQL": [r"SQL syntax.*MySQL", r"Warning.*mysql_.*", r"valid MySQL result", r"MySqlClient\."],\
-    "PostgreSQL": [r"PostgreSQL.*ERROr", r"Warning.*\Wpg_.*", r"valid PostgreSQL result", r"Npgsql\."],\
+    "PostgreSQL": [r"PostgreSQL.*ERROR", r"Warning.*\Wpg_.*", r"valid PostgreSQL result", r"Npgsql\."],\
     "Microsoft SQL Server": [r"Driver.* SQL[\-\_\ ]*Server", r"OLE DB.* SQL Server", r"(\W|\A)SQL Server.*Driver", r"Warning.*mssql_.*", r"(\W|\A)SQL Server.*[0-9a-fA-F]{8}", r"Exception Details:.*\WSystem\.Data\.SqlClient\.", r"Exception Details:.*\WRoadhouse\.Cms\."],\
     "Microsoft Access": [r"Microsoft Access Driver", r"JET Database Engine", r"Access Database Engine"],\
     "Oracle": [r"ORA-[0-9][0-9][0-9][0-9]", r"Oracle error", r"Oracle.*Driver", r"Warning.*\Woci_.*", r"Warning.*\Wora_.*"],\
