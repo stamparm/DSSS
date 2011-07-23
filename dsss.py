@@ -85,7 +85,7 @@ def scan_page(url):
                                     print " (i) parameter '%s' appears to be blind SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
                                     retval = True
     except KeyboardInterrupt:
-        print "\n (x) Ctrl-C was pressed"
+        print "\r (x) Ctrl-C was pressed"
     return retval
 
 if __name__ == "__main__":
