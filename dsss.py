@@ -3,7 +3,7 @@
 import difflib, httplib, optparse, random, re, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code)"
-VERSION = "0.1f"
+VERSION = "0.1g"
 AUTHOR  = "Miroslav Stampar (http://unconciousmind.blogspot.com | @stamparm)"
 LICENSE = "Public domain (FREE)"
 
@@ -38,7 +38,7 @@ def retrieve_content(url):
         retval[HTTPCODE] = getattr(ex, "code", None)
         retval[HTML] = getattr(ex, "msg", str())
         retval[HTML] = ex.read() if hasattr(ex, "read") else retval[HTML]
-    match = re.search(r"<title>(?P<title>[^<]+?)</title>", retval[HTML], re.I)
+    match = re.search(r"<title>(?P<title>[^<]+)</title>", retval[HTML], re.I)
     retval[TITLE] = match.group("title") if match else None
     retval[TEXT] = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s+", " ", retval[HTML])
     return retval
