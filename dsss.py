@@ -3,7 +3,7 @@
 import difflib, httplib, optparse, random, re, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code)"
-VERSION = "0.1g"
+VERSION = "0.1h"
 AUTHOR  = "Miroslav Stampar (http://unconciousmind.blogspot.com | @stamparm)"
 LICENSE = "Public domain (FREE)"
 
@@ -33,7 +33,7 @@ DBMS_ERRORS = {
 def retrieve_content(url):
     retval = {HTTPCODE: httplib.OK}
     try:
-        retval[HTML] = urllib2.urlopen(url.replace(" ", "%20")).read() # replacing ' ' with %20 is a quick/dirty fix for urllib2
+        retval[HTML] = urllib2.urlopen("".join([url[i].replace(' ', '%20') if i > url.find('?') else url[i] for i in xrange(len(url))])).read() # replacing ' ' with %20 is a quick/dirty fix for urllib2
     except Exception, ex:
         retval[HTTPCODE] = getattr(ex, "code", None)
         retval[HTML] = getattr(ex, "msg", str())
@@ -57,14 +57,14 @@ def scan_page(url):
     try:
         for link in shallow_crawl(url):
             print "* scanning: %s%s" % (link, " (no GET parameters)" if '?' not in link else "")
-            for match in re.finditer(r"(?:[?&;])((?P<parameter>\w+)=[^&;]+)", link):
+            for match in re.finditer(r"[?&;]((?P<parameter>\w+)=[^&;]+)|[^/](/\d+)(?=(/|\Z))", link):
                 vulnerable = False
                 tampered = link.replace(match.group(0), match.group(0) + "".join(random.sample(INVALID_SQL_CHAR_POOL, len(INVALID_SQL_CHAR_POOL))))
                 content = retrieve_content(tampered)
                 for dbms in DBMS_ERRORS:
                     for regex in DBMS_ERRORS[dbms]:
                         if not vulnerable and re.search(regex, content[HTML], re.I):
-                            print " (o) parameter '%s' could be error SQLi vulnerable! (%s error message)" % (match.group("parameter"), dbms)
+                            print " (o) %s could be error SQLi vulnerable! (%s error message)" % ("parameter '%s'" % match.group("parameter") if match.groupdict().get("parameter") else "url", dbms)
                             retval = vulnerable = True
                 vulnerable = False
                 original = retrieve_content(link)
@@ -82,7 +82,7 @@ def scan_page(url):
                                     ratios = dict([(x, difflib.SequenceMatcher(None, original[TEXT], contents[x][TEXT]).quick_ratio()) for x in (True, False)])
                                     vulnerable = ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
                                 if vulnerable:
-                                    print " (i) parameter '%s' appears to be blind SQLi vulnerable! (\"%s\")" % (match.group("parameter"), payloads[True])
+                                    print " (i) %s appears to be blind SQLi vulnerable! (\"%s\")" % ("parameter '%s'" % match.group("parameter") if match.groupdict().get("parameter") else "url", payloads[True])
                                     retval = True
     except KeyboardInterrupt:
         print "\r (x) Ctrl-C was pressed"
