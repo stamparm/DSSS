@@ -1,6 +1,6 @@
 Damn Small SQLi Scanner (DSSS) has been made as a PoC where I wanted to show that commercial (SQLi) scanners can be beaten under 100 lines of code.
 
-It supports blind/error SQLi tests, depth 1 crawling and advanced comparison of different response attributes to distinguish blind responses. If you are satisfied with your commercial tool scanning results then I believe that you could even be more satisfied with this one.
+It supports blind/error SQLi tests, depth 1 crawling and advanced comparison of different response attributes to distinguish blind responses. Also, mod_rewrite parameter format is supported (e.g. www.site.com/index/1). If you are satisfied with your commercial tool scanning results then I believe that you could even be more satisfied with this one.
 
 Currently only GET parameters are supported as of code line restrictions (<100 LOC).
 
