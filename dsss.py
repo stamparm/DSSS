@@ -38,8 +38,8 @@ def retrieve_content(url):
         retval[HTTPCODE] = getattr(ex, "code", None)
         retval[HTML] = getattr(ex, "msg", str())
         retval[HTML] = ex.read() if hasattr(ex, "read") else retval[HTML]
-    match = re.search(r"<title>(?P<title>[^<]+)</title>", retval[HTML], re.I)
-    retval[TITLE] = match.group("title") if match else None
+    match = re.search(r"<title>(?P<result>[^<]+)</title>", retval[HTML], re.I)
+    retval[TITLE] = match.group("result") if match and "result" in match.groupdict() else None
     retval[TEXT] = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s+", " ", retval[HTML])
     return retval
 
