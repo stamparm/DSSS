@@ -33,7 +33,11 @@ DBMS_ERRORS = {
 def retrieve_content(url):
     retval = {HTTPCODE: httplib.OK}
     try:
-        retval[HTML] = urllib2.urlopen("".join([url[i].replace(' ', '%20') if i > url.find('?') else url[i] for i in xrange(len(url))])).read() # replacing ' ' with %20 is a quick/dirty fix for urllib2
+	url = urllib2.quote(url, safe="%/:=&?~#+!$,;'@()*[]")
+	req = urllib2.build_opener()
+	if options.cookie:
+		req.addheaders.append(('Cookie', options.cookie))
+	retval[HTML] = req.open(url)
     except Exception, ex:
         retval[HTTPCODE] = getattr(ex, "code", None)
         retval[HTML] = getattr(ex, "msg", str())
@@ -90,7 +94,7 @@ def scan_page(url):
 
 if __name__ == "__main__":
     print "%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)
-    parser = optparse.OptionParser(version=VERSION, option_list=[optparse.make_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.target.com/page.htm?id=1\")")])
+    parser = optparse.OptionParser(version=VERSION, option_list=[optparse.make_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.target.com/page.htm?id=1\")"),optparse.make_option("-c", "--cookie", dest="cookie", help="Cookie values to use when making requests")])
     options, _ = parser.parse_args()
     if options.url:
         result = scan_page(options.url if options.url.startswith("http") else "http://%s" % options.url)
