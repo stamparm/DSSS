@@ -37,7 +37,7 @@ def retrieve_content(url):
 	req = urllib2.build_opener()
 	if options.cookie:
 		req.addheaders.append(('Cookie', options.cookie))
-	retval[HTML] = req.open(url)
+	retval[HTML] = req.open(url).read()
     except Exception, ex:
         retval[HTTPCODE] = getattr(ex, "code", None)
         retval[HTML] = getattr(ex, "msg", str())
