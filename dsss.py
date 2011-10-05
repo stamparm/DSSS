@@ -33,11 +33,9 @@ DBMS_ERRORS = {
 def retrieve_content(url):
     retval = {HTTPCODE: httplib.OK}
     try:
-	url = urllib2.quote(url, safe="%/:=&?~#+!$,;'@()*[]")
 	req = urllib2.build_opener()
-	if options.cookie:
-		req.addheaders.append(('Cookie', options.cookie))
-	retval[HTML] = req.open(url).read()
+	if options.cookie: req.addheaders.append(('Cookie', options.cookie))
+	retval[HTML] = req.open(urllib2.quote(url, safe="%/:=&?~#+!$,;'@()*[]")).read()
     except Exception, ex:
         retval[HTTPCODE] = getattr(ex, "code", None)
         retval[HTML] = getattr(ex, "msg", str())
@@ -52,8 +50,7 @@ def shallow_crawl(url):
     retval = set([url])
     for match in re.finditer(r"href\s*=\s*\"(?P<href>[^\"]+)\"", retrieve_content(url)[HTML], re.I):
         link = urlparse.urljoin(url, match.group("href"))
-        if reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, link])):
-            retval.add(link)
+        if reduce(lambda x, y: x == y, map(lambda x: urlparse.urlparse(x).netloc.split(':')[0], [url, link])): retval.add(link)
     return retval
 
 def scan_page(url):
@@ -92,12 +89,11 @@ def scan_page(url):
         print "\r (x) Ctrl-C was pressed"
     return retval
 
-if __name__ == "__main__":
-    print "%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)
-    parser = optparse.OptionParser(version=VERSION, option_list=[optparse.make_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.target.com/page.htm?id=1\")"),optparse.make_option("-c", "--cookie", dest="cookie", help="Cookie values to use when making requests")])
-    options, _ = parser.parse_args()
-    if options.url:
-        result = scan_page(options.url if options.url.startswith("http") else "http://%s" % options.url)
-        print "\nscan results: %s vulnerabilities found" % ("possible" if result else "no")
-    else:
-        parser.print_help()
+print "%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)
+parser = optparse.OptionParser(version=VERSION, option_list=[optparse.make_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.target.com/page.htm?id=1\")"),optparse.make_option("-c", "--cookie", dest="cookie", help="Cookie values to use when making requests")])
+options, _ = parser.parse_args()
+if options.url:
+    result = scan_page(options.url if options.url.startswith("http") else "http://%s" % options.url)
+    print "\nscan results: %s vulnerabilities found" % ("possible" if result else "no")
+else:
+    parser.print_help()
