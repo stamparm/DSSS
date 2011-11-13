@@ -63,7 +63,7 @@ def scan_page(url, data=None):
                         template = "%s%s%s" % (prefix, boolean, suffix)
                         payloads = dict([(x, current.replace(match.group(0), "%s%s" % (match.group(0), (template % (left, left if x else right))))) for x in (True, False)])
                         contents = dict([(x, retrieve_content(payloads[x], data) if phase is GET else retrieve_content(url, payloads[x])) for x in (True, False)])
-                        if any(map(lambda x: original[x] == contents[True][x] != contents[False][x], [HTTPCODE, TITLE])) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
+                        if any([original[x] == contents[True][x] != contents[False][x] for x in (HTTPCODE, TITLE)]) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
                             vulnerable = True
                         else:
                             ratios = dict([(x, difflib.SequenceMatcher(None, original[TEXT], contents[x][TEXT]).quick_ratio()) for x in (True, False)])
