@@ -7,14 +7,14 @@ VERSION = "0.2"
 AUTHOR  = "Miroslav Stampar (http://unconciousmind.blogspot.com | @stamparm)"
 LICENSE = "Public domain (FREE)"
 
-INVALID_SQL_CHAR_POOL = ('(', ')', '\'', '"')                     # characters used for SQL poisoning of parameter values
-PREFIXES, SUFFIXES = ((" ", ") ", "' ", "') "), ("", "-- ", "#")) # prefix and suffix values used for building testing blind payloads
-BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d=%d)")                   # boolean tests used for building testing blind payloads
-COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"           # optional HTTP header names
-GET, POST = "GET", "POST"                                         # enumerator-like values used for marking current phase
-TEXT, HTTPCODE, TITLE, HTML = range(4)                            # enumerator-like values used for marking content type
-MIN_BOOL_VAL, MAX_BOOL_VAL = 100, 255                             # minimum and maximum random range values used in boolean tests
-FUZZY_THRESHOLD = 0.95                                            # ratio value in range (0,1) used for distinguishing True from False responses
+INVALID_SQL_CHAR_POOL = ('(', ')', '\'', '"')                            # characters used for SQL poisoning of parameter values
+PREFIXES, SUFFIXES = ((" ", ") ", "' ", "') ", "\""), ("", "-- ", "#"))  # prefix and suffix values used for building testing blind payloads
+BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d=%d)")                          # boolean tests used for building testing blind payloads
+COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"                  # optional HTTP header names
+GET, POST = "GET", "POST"                                                # enumerator-like values used for marking current phase
+TEXT, HTTPCODE, TITLE, HTML = range(4)                                   # enumerator-like values used for marking content type
+MIN_BOOL_VAL, MAX_BOOL_VAL = 100, 255                                    # minimum and maximum random range values used in boolean tests
+FUZZY_THRESHOLD = 0.95                                                   # ratio value in range (0,1) used for distinguishing True from False responses
 
 DBMS_ERRORS = {
     "MySQL": [r"SQL syntax.*MySQL", r"Warning.*mysql_.*", r"valid MySQL result", r"MySqlClient\."],\
@@ -24,7 +24,7 @@ DBMS_ERRORS = {
     "Oracle": [r"ORA-[0-9][0-9][0-9][0-9]", r"Oracle error", r"Oracle.*Driver", r"Warning.*\Woci_.*", r"Warning.*\Wora_.*"],\
 }
 
-_headers = None                                                   # used for storing dictionary with optional header values
+_headers = None                                                          # used for storing dictionary with optional header values
 
 def retrieve_content(url, data=None):
     retval = {HTTPCODE: httplib.OK}
