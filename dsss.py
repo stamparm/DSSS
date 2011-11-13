@@ -24,7 +24,7 @@ DBMS_ERRORS = {
     "Oracle": [r"ORA-[0-9][0-9][0-9][0-9]", r"Oracle error", r"Oracle.*Driver", r"Warning.*\Woci_.*", r"Warning.*\Wora_.*"],\
 }
 
-_headers = None                                          # used for storing dictionary with optional header values
+_headers = None                                                   # used for storing dictionary with optional header values
 
 def retrieve_content(url, data=None):
     retval = {HTTPCODE: httplib.OK}
