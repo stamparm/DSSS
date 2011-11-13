@@ -13,6 +13,7 @@ BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d=%d)")                   # boolean test
 COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"           # optional HTTP header names
 GET, POST = "GET", "POST"                                         # enumerator-like values used for marking current phase
 TEXT, HTTPCODE, TITLE, HTML = range(4)                            # enumerator-like values used for marking content type
+MIN_BOOL_VAL, MAX_BOOL_VAL = 100, 255                             # minimum and maximum random range values used in boolean tests
 FUZZY_THRESHOLD = 0.95                                            # ratio value in range (0,1) used for distinguishing True from False responses
 
 DBMS_ERRORS = {
@@ -55,7 +56,7 @@ def scan_page(url, data=None):
                             retval = vulnerable = True
                 vulnerable = False
                 original = retrieve_content(current, data) if phase is GET else retrieve_content(url, current)
-                left, right = random.sample(xrange(100, 256), 2)
+                left, right = random.sample(xrange(MIN_BOOL_VAL, MAX_BOOL_VAL + 1), 2)
                 for prefix, boolean, suffix in itertools.product(PREFIXES, BOOLEAN_TESTS, SUFFIXES):
                     if not vulnerable:
                         template = "%s%s%s" % (prefix, boolean, suffix)
