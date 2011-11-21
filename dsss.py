@@ -37,7 +37,7 @@ def retrieve_content(url, data=None):
         retval[HTML] = ex.read() if hasattr(ex, "read") else getattr(ex, "msg", str())
     match = re.search(r"<title>(?P<result>[^<]+)</title>", retval[HTML], re.I)
     retval[TITLE] = match.group("result") if match and "result" in match.groupdict() else None
-    retval[TEXT] = re.sub(r"<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s+", " ", retval[HTML], flags=re.I|re.S)
+    retval[TEXT] = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s+", " ", retval[HTML])
     return retval
 
 def scan_page(url, data=None):
