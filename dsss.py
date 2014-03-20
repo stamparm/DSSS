@@ -83,7 +83,7 @@ def init_options(proxy=None, cookie=None, ua=None, referer=None):
 if __name__ == "__main__":
     print "%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)
     parser = optparse.OptionParser(version=VERSION)
-    parser.add_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.target.com/page.htm?id=1\")")
+    parser.add_option("-u", "--url", dest="url", help="Target URL (e.g. \"http://www.target.com/page.php?id=1\")")
     parser.add_option("--data", dest="data", help="POST data (e.g. \"query=test\")")
     parser.add_option("--cookie", dest="cookie", help="HTTP Cookie header value")
     parser.add_option("--user-agent", dest="ua", help="HTTP User-Agent header value")
