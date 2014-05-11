@@ -29,7 +29,7 @@ _headers = {}                                           # used for storing dicti
 def retrieve_content(url, data=None):
     retval = {HTTPCODE: httplib.OK}
     try:
-        req = urllib2.Request("".join(url[i].replace(' ', '%20') if i > url.find('?') else url[i] for i in xrange(len(url))), data, _headers)
+        req = urllib2.Request("".join(url[_].replace(' ', '%20') if _ > url.find('?') else url[_] for _ in xrange(len(url))), data, _headers)
         retval[HTML] = urllib2.urlopen(req).read()
     except Exception, ex:
         retval[HTTPCODE] = getattr(ex, "code", None)
@@ -59,12 +59,12 @@ def scan_page(url, data=None):
                 for prefix, boolean, suffix in itertools.product(PREFIXES, BOOLEAN_TESTS, SUFFIXES):
                     if not vulnerable:
                         template = "%s%s%s" % (prefix, boolean, suffix)
-                        payloads = dict((x, current.replace(match.group(0), "%s%s" % (match.group(0), (template % (left, left if x else right))))) for x in (True, False))
-                        contents = dict((x, retrieve_content(payloads[x], data) if phase is GET else retrieve_content(url, payloads[x])) for x in (True, False))
-                        if any(original[x] == contents[True][x] != contents[False][x] for x in (HTTPCODE, TITLE)) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
+                        payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), (template % (left, left if _ else right))))) for _ in (True, False))
+                        contents = dict((_, retrieve_content(payloads[_], data) if phase is GET else retrieve_content(url, payloads[_])) for _ in (True, False))
+                        if any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE)) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
                             vulnerable = True
                         else:
-                            ratios = dict((x, difflib.SequenceMatcher(None, original[TEXT], contents[x][TEXT]).quick_ratio()) for x in (True, False))
+                            ratios = dict((_, difflib.SequenceMatcher(None, original[TEXT], contents[_][TEXT]).quick_ratio()) for _ in (True, False))
                             vulnerable = ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
                         if vulnerable:
                             print " (i) %s parameter '%s' appears to be blind SQLi vulnerable" % (phase, match.group("parameter"))
