@@ -7,14 +7,14 @@ VERSION = "0.2c"
 AUTHOR  = "Miroslav Stampar (http://unconciousmind.blogspot.com | @stamparm)"
 LICENSE = "Public domain (FREE)"
 
-PREFIXES = (" ", ") ", "' ", "') ", "\"", "%' ", "%') ")               # prefix values used for building testing blind payloads
-SUFFIXES = ("", "-- ", "#", "%%00", "%%16")               # suffix values used for building testing blind payloads
-TAMPER_SQL_CHAR_POOL = ('(', ')', '\'', '"')            # characters used for SQL tampering/poisoning of parameter values
-BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d=%d)")         # boolean tests used for building testing blind payloads
-COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer" # optional HTTP header names
-GET, POST = "GET", "POST"                               # enumerator-like values used for marking current phase
-TEXT, HTTPCODE, TITLE, HTML = range(4)                  # enumerator-like values used for marking content type
-FUZZY_THRESHOLD = 0.95                                  # ratio value in range (0,1) used for distinguishing True from False responses
+PREFIXES = (" ", ") ", "' ", "') ", "\"", "%' ", "%') ")                # prefix values used for building testing blind payloads
+SUFFIXES = ("", "-- ", "#", "%%00", "%%16")                             # suffix values used for building testing blind payloads
+TAMPER_SQL_CHAR_POOL = ('(', ')', '\'', '"')                            # characters used for SQL tampering/poisoning of parameter values
+BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d=%d)")                         # boolean tests used for building testing blind payloads
+COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"                 # optional HTTP header names
+GET, POST = "GET", "POST"                                               # enumerator-like values used for marking current phase
+TEXT, HTTPCODE, TITLE, HTML = range(4)                                  # enumerator-like values used for marking content type
+FUZZY_THRESHOLD = 0.95                                                  # ratio value in range (0,1) used for distinguishing True from False responses
 
 DBMS_ERRORS = {
     "MySQL": (r"SQL syntax.*MySQL", r"Warning.*mysql_.*", r"valid MySQL result", r"MySqlClient\."),
