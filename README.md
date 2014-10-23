@@ -20,7 +20,9 @@ Options:
   --user-agent=UA    HTTP User-Agent header value
   --referer=REFERER  HTTP Referer header value
   --proxy=PROXY      HTTP proxy address (e.g. "http://127.0.0.1:8080")
+```
 
+```
 $ python dsss.py -u "http://testphp.vulnweb.com/artists.php?artist=1"
 Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code) #v0.2c
  by: Miroslav Stampar (@stamparm)
