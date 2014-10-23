@@ -2,8 +2,8 @@
 
 import difflib, httplib, itertools, optparse, random, re, urllib2, urlparse
 
-NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code)"
-VERSION = "0.2c"
+NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)"
+VERSION = "0.2d"
 AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
@@ -24,7 +24,7 @@ DBMS_ERRORS = {
     "Oracle": (r"ORA-[0-9][0-9][0-9][0-9]", r"Oracle error", r"Oracle.*Driver", r"Warning.*\Woci_.*", r"Warning.*\Wora_.*")
 }
 
-_headers = {}                                           # used for storing dictionary with optional header values
+_headers = {}                                                           # used for storing dictionary with optional header values
 
 def retrieve_content(url, data=None):
     retval = {HTTPCODE: httplib.OK}
