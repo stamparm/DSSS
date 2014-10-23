@@ -4,7 +4,7 @@ import difflib, httplib, itertools, optparse, random, re, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code)"
 VERSION = "0.2c"
-AUTHOR  = "Miroslav Stampar (http://unconciousmind.blogspot.com | @stamparm)"
+AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
 PREFIXES = (" ", ") ", "' ", "') ", "\"", "%' ", "%') ")                # prefix values used for building testing blind payloads
