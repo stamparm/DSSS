@@ -6,7 +6,7 @@ As of optional settings it supports HTTP proxy together with HTTP header values 
 
 ```
 $ python dsss.py -h
-Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code) #v0.2c
+Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2c
  by: Miroslav Stampar (@stamparm)
 
 Usage: dsss.py [options]
@@ -24,7 +24,7 @@ Options:
 
 ```
 $ python dsss.py -u "http://testphp.vulnweb.com/artists.php?artist=1"
-Damn Small SQLi Scanner (DSSS) < 100 LOC (Lines of Code) #v0.2c
+Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2c
  by: Miroslav Stampar (@stamparm)
 
 * scanning GET parameter 'artist'
