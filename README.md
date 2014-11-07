@@ -1,4 +1,4 @@
-Damn Small SQLi Scanner (DSSS) has been made as a PoC to show that commercial (SQLi) scanners can be beaten under 100 lines of code.
+**Damn Small SQLi Scanner** (DSSS) has been made as a PoC to show that commercial (SQLi) scanners can be beaten under 100 lines of code.
 
 It supports GET and POST parameters, blind/error SQLi tests and advanced comparison of different response attributes to distinguish blind responses. If you are satisfied with your commercial tool scanning results then I believe that you could even be more satisfied with this one.
 
