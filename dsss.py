@@ -15,6 +15,7 @@ COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"                 # option
 GET, POST = "GET", "POST"                                               # enumerator-like values used for marking current phase
 TEXT, HTTPCODE, TITLE, HTML = xrange(4)                                 # enumerator-like values used for marking content type
 FUZZY_THRESHOLD = 0.95                                                  # ratio value in range (0,1) used for distinguishing True from False responses
+TIMEOUT = 30                                                            # connection timeout in seconds
 
 DBMS_ERRORS = {
     "MySQL": (r"SQL syntax.*MySQL", r"Warning.*mysql_.*", r"valid MySQL result", r"MySqlClient\."),
@@ -30,7 +31,7 @@ def _retrieve_content(url, data=None):
     retval = {HTTPCODE: httplib.OK}
     try:
         req = urllib2.Request("".join(url[_].replace(' ', "%20") if _ > url.find('?') else url[_] for _ in xrange(len(url))), data, _headers)
-        retval[HTML] = urllib2.urlopen(req).read()
+        retval[HTML] = urllib2.urlopen(req, timeout=TIMEOUT).read()
     except Exception, ex:
         retval[HTTPCODE] = getattr(ex, "code", None)
         retval[HTML] = ex.read() if hasattr(ex, "read") else getattr(ex, "msg", "")
