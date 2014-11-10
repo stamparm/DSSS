@@ -26,7 +26,7 @@ DBMS_ERRORS = {
 
 _headers = {}                                                           # used for storing dictionary with optional header values
 
-def retrieve_content(url, data=None):
+def _retrieve_content(url, data=None):
     retval = {HTTPCODE: httplib.OK}
     try:
         req = urllib2.Request("".join(url[_].replace(' ', "%20") if _ > url.find('?') else url[_] for _ in xrange(len(url))), data, _headers)
@@ -48,19 +48,19 @@ def scan_page(url, data=None):
                 vulnerable, usable = False, True
                 print "* scanning %s parameter '%s'" % (phase, match.group("parameter"))
                 tampered = current.replace(match.group(0), "%s%s" % (match.group(0), "".join(random.sample(TAMPER_SQL_CHAR_POOL, len(TAMPER_SQL_CHAR_POOL)))))
-                content = retrieve_content(tampered, data) if phase is GET else retrieve_content(url, tampered)
+                content = _retrieve_content(tampered, data) if phase is GET else _retrieve_content(url, tampered)
                 for (dbms, regex) in ((dbms, regex) for dbms in DBMS_ERRORS for regex in DBMS_ERRORS[dbms]):
                     if not vulnerable and re.search(regex, content[HTML], re.I):
                         print " (i) %s parameter '%s' could be error SQLi vulnerable (%s)" % (phase, match.group("parameter"), dbms)
                         retval = vulnerable = True
                 vulnerable = False
-                original = retrieve_content(current, data) if phase is GET else retrieve_content(url, current)
+                original = _retrieve_content(current, data) if phase is GET else _retrieve_content(url, current)
                 left, right = random.sample(xrange(256), 2)
                 for prefix, boolean, suffix in itertools.product(PREFIXES, BOOLEAN_TESTS, SUFFIXES):
                     if not vulnerable:
                         template = "%s%s%s" % (prefix, boolean, suffix)
                         payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), (template % (left, left if _ else right))))) for _ in (True, False))
-                        contents = dict((_, retrieve_content(payloads[_], data) if phase is GET else retrieve_content(url, payloads[_])) for _ in (True, False))
+                        contents = dict((_, _retrieve_content(payloads[_], data) if phase is GET else _retrieve_content(url, payloads[_])) for _ in (True, False))
                         if any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE)) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
                             vulnerable = True
                         else:
