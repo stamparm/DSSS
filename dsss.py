@@ -13,7 +13,7 @@ TAMPER_SQL_CHAR_POOL = ('(', ')', '\'', '"')                            # charac
 BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d=%d)")                         # boolean tests used for building testing blind payloads
 COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"                 # optional HTTP header names
 GET, POST = "GET", "POST"                                               # enumerator-like values used for marking current phase
-TEXT, HTTPCODE, TITLE, HTML = range(4)                                  # enumerator-like values used for marking content type
+TEXT, HTTPCODE, TITLE, HTML = xrange(4)                                  # enumerator-like values used for marking content type
 FUZZY_THRESHOLD = 0.95                                                  # ratio value in range (0,1) used for distinguishing True from False responses
 
 DBMS_ERRORS = {
@@ -29,7 +29,7 @@ _headers = {}                                                           # used f
 def retrieve_content(url, data=None):
     retval = {HTTPCODE: httplib.OK}
     try:
-        req = urllib2.Request("".join(url[_].replace(' ', '%20') if _ > url.find('?') else url[_] for _ in xrange(len(url))), data, _headers)
+        req = urllib2.Request("".join(url[_].replace(' ', "%20") if _ > url.find('?') else url[_] for _ in xrange(len(url))), data, _headers)
         retval[HTML] = urllib2.urlopen(req).read()
     except Exception, ex:
         retval[HTTPCODE] = getattr(ex, "code", None)
@@ -76,9 +76,9 @@ def scan_page(url, data=None):
     return retval
 
 def init_options(proxy=None, cookie=None, ua=None, referer=None):
-    if proxy:
-        urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler({'http': proxy})))
-    _headers.update(dict(filter(lambda item: item[1], [(COOKIE, cookie), (UA, ua), (REFERER, referer)])))
+    global _headers
+    urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler({'http': proxy})) if proxy else None)
+    _headers = dict(filter(lambda item: item[1], ((COOKIE, cookie), (UA, ua), (REFERER, referer))))
 
 if __name__ == "__main__":
     print "%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)
