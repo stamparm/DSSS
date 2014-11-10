@@ -7,13 +7,13 @@ VERSION = "0.2e"
 AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
-PREFIXES = (" ", ") ", "' ", "') ", "\"", "%%' ", "%%') ")                # prefix values used for building testing blind payloads
+PREFIXES = (" ", ") ", "' ", "') ", "\"", "%%' ", "%%') ")              # prefix values used for building testing blind payloads
 SUFFIXES = ("", "-- ", "#", "%%00", "%%16")                             # suffix values used for building testing blind payloads
 TAMPER_SQL_CHAR_POOL = ('(', ')', '\'', '"')                            # characters used for SQL tampering/poisoning of parameter values
 BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d=%d)")                         # boolean tests used for building testing blind payloads
 COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"                 # optional HTTP header names
 GET, POST = "GET", "POST"                                               # enumerator-like values used for marking current phase
-TEXT, HTTPCODE, TITLE, HTML = xrange(4)                                  # enumerator-like values used for marking content type
+TEXT, HTTPCODE, TITLE, HTML = xrange(4)                                 # enumerator-like values used for marking content type
 FUZZY_THRESHOLD = 0.95                                                  # ratio value in range (0,1) used for distinguishing True from False responses
 
 DBMS_ERRORS = {
@@ -77,8 +77,8 @@ def scan_page(url, data=None):
 
 def init_options(proxy=None, cookie=None, ua=None, referer=None):
     global _headers
+    _headers = dict(filter(lambda _: _[1], ((COOKIE, cookie), (UA, ua), (REFERER, referer))))
     urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler({'http': proxy})) if proxy else None)
-    _headers = dict(filter(lambda item: item[1], ((COOKIE, cookie), (UA, ua), (REFERER, referer))))
 
 if __name__ == "__main__":
     print "%s #v%s\n by: %s\n" % (NAME, VERSION, AUTHOR)
