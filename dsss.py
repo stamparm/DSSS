@@ -3,11 +3,11 @@
 import difflib, httplib, itertools, optparse, random, re, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)"
-VERSION = "0.2d"
+VERSION = "0.2e"
 AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
-PREFIXES = (" ", ") ", "' ", "') ", "\"", "%' ", "%') ")                # prefix values used for building testing blind payloads
+PREFIXES = (" ", ") ", "' ", "') ", "\"", "%%' ", "%%') ")                # prefix values used for building testing blind payloads
 SUFFIXES = ("", "-- ", "#", "%%00", "%%16")                             # suffix values used for building testing blind payloads
 TAMPER_SQL_CHAR_POOL = ('(', ')', '\'', '"')                            # characters used for SQL tampering/poisoning of parameter values
 BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d=%d)")                         # boolean tests used for building testing blind payloads
