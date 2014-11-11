@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-import difflib, httplib, itertools, optparse, random, re, urllib2, urlparse
+import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)"
-VERSION = "0.2e"
+VERSION = "0.2f"
 AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
@@ -48,7 +48,7 @@ def scan_page(url, data=None):
             for match in re.finditer(r"((\A|[?&])(?P<parameter>\w+)=)(?P<value>[^&]+)", current):
                 vulnerable, usable = False, True
                 print "* scanning %s parameter '%s'" % (phase, match.group("parameter"))
-                tampered = current.replace(match.group(0), "%s%s" % (match.group(0), "".join(random.sample(TAMPER_SQL_CHAR_POOL, len(TAMPER_SQL_CHAR_POOL)))))
+                tampered = current.replace(match.group(0), "%s%s" % (match.group(0), urllib.quote("".join(random.sample(TAMPER_SQL_CHAR_POOL, len(TAMPER_SQL_CHAR_POOL))))))
                 content = _retrieve_content(tampered, data) if phase is GET else _retrieve_content(url, tampered)
                 for (dbms, regex) in ((dbms, regex) for dbms in DBMS_ERRORS for regex in DBMS_ERRORS[dbms]):
                     if not vulnerable and re.search(regex, content[HTML], re.I):
@@ -60,7 +60,7 @@ def scan_page(url, data=None):
                 for prefix, boolean, suffix in itertools.product(PREFIXES, BOOLEAN_TESTS, SUFFIXES):
                     if not vulnerable:
                         template = "%s%s%s" % (prefix, boolean, suffix)
-                        payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), (template % (left, left if _ else right))))) for _ in (True, False))
+                        payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), urllib.quote(template % (left, left if _ else right), safe='%')))) for _ in (True, False))
                         contents = dict((_, _retrieve_content(payloads[_], data) if phase is GET else _retrieve_content(url, payloads[_])) for _ in (True, False))
                         if any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE)) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT]):
                             vulnerable = True
@@ -78,7 +78,7 @@ def scan_page(url, data=None):
 
 def init_options(proxy=None, cookie=None, ua=None, referer=None):
     global _headers
-    _headers = dict(filter(lambda _: _[1], ((COOKIE, cookie), (UA, ua), (REFERER, referer))))
+    _headers = dict(filter(lambda _: _[1], ((COOKIE, cookie), (UA, ua or NAME), (REFERER, referer))))
     urllib2.install_opener(urllib2.build_opener(urllib2.ProxyHandler({'http': proxy})) if proxy else None)
 
 if __name__ == "__main__":
