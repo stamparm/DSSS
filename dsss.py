@@ -3,7 +3,7 @@
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)"
-VERSION = "0.2g"
+VERSION = "0.2h"
 AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
@@ -44,7 +44,7 @@ def scan_page(url, data=None):
     retval, usable = False, False
     try:
         for phase in (GET, POST):
-            current = url if phase is GET else (data or "")
+            original, current = None, url if phase is GET else (data or "")
             for match in re.finditer(r"((\A|[?&])(?P<parameter>\w+)=)(?P<value>[^&]+)", current):
                 vulnerable, usable = False, True
                 print "* scanning %s parameter '%s'" % (phase, match.group("parameter"))
@@ -55,7 +55,7 @@ def scan_page(url, data=None):
                         print " (i) %s parameter '%s' could be error SQLi vulnerable (%s)" % (phase, match.group("parameter"), dbms)
                         retval = vulnerable = True
                 vulnerable = False
-                original = _retrieve_content(current, data) if phase is GET else _retrieve_content(url, current)
+                original = original or (_retrieve_content(current, data) if phase is GET else _retrieve_content(url, current))
                 left, right = random.sample(xrange(256), 2)
                 for prefix, boolean, suffix in itertools.product(PREFIXES, BOOLEAN_TESTS, SUFFIXES):
                     if not vulnerable:
