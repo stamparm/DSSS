@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)"
-VERSION = "0.2i"
+VERSION = "0.2j"
 AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
@@ -42,6 +41,7 @@ def _retrieve_content(url, data=None):
 
 def scan_page(url, data=None):
     retval, usable = False, False
+    url, data = re.sub(r"=(&|\Z)", "=1\g<1>", url) if url else url, re.sub(r"=(&|\Z)", "=1\g<1>", data) if data else data
     try:
         for phase in (GET, POST):
             original, current = None, url if phase is GET else (data or "")
