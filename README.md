@@ -1,6 +1,4 @@
-**Damn Small SQLi Scanner** (DSSS) has been made as a PoC to show that commercial (SQLi) scanners can be beaten under 100 lines of code.
-
-It supports GET and POST parameters, blind/error SQLi tests and advanced comparison of different response attributes to distinguish blind responses. If you are satisfied with your commercial tool scanning results then I believe that you could even be more satisfied with this one.
+**Damn Small SQLi Scanner** (DSSS) is a fully functional SQL injection vulnerability scanner (supporting GET and POST parameters) written in under 100 lines of code. It performs blind/error SQLi tests and advanced comparison of different response attributes to distinguish server responses.
 
 As of optional settings it supports HTTP proxy together with HTTP header values "User-Agent", "Referer" and "Cookie".
 
