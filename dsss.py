@@ -2,7 +2,7 @@
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)"
-VERSION = "0.2j"
+VERSION = "0.2k"
 AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
@@ -61,7 +61,7 @@ def scan_page(url, data=None):
                     if not vulnerable:
                         template = "%s%s%s" % (prefix, boolean, suffix)
                         payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), urllib.quote(template % (left, left if _ else right), safe='%')))) for _ in (True, False))
-                        contents = dict((_, _retrieve_content(payloads[_], data) if phase is GET else _retrieve_content(url, payloads[_])) for _ in (True, False))
+                        contents = dict((_, _retrieve_content(payloads[_], data) if phase is GET else _retrieve_content(url, payloads[_])) for _ in (False, True))
                         if all(_[HTTPCODE] for _ in (original, contents[True], contents[False])) and (any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE)) or len(original[TEXT]) == len(contents[True][TEXT]) != len(contents[False][TEXT])):
                             vulnerable = True
                         else:
