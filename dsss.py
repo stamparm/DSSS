@@ -2,14 +2,14 @@
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)"
-VERSION = "0.2l"
+VERSION = "0.2m"
 AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
 PREFIXES = (" ", ") ", "' ", "') ", "\"", "%%' ", "%%') ")              # prefix values used for building testing blind payloads
 SUFFIXES = ("", "-- -", "#", "%%00", "%%16")                            # suffix values used for building testing blind payloads
 TAMPER_SQL_CHAR_POOL = ('(', ')', '\'', '"')                            # characters used for SQL tampering/poisoning of parameter values
-BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d=%d)")                         # boolean tests used for building testing blind payloads
+BOOLEAN_TESTS = ("AND %d>%d", "OR NOT (%d>%d)")                         # boolean tests used for building testing blind payloads
 COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"                 # optional HTTP header names
 GET, POST = "GET", "POST"                                               # enumerator-like values used for marking current phase
 TEXT, HTTPCODE, TITLE, HTML = xrange(4)                                 # enumerator-like values used for marking content type
@@ -56,17 +56,17 @@ def scan_page(url, data=None):
                         retval = vulnerable = True
                 vulnerable = False
                 original = original or (_retrieve_content(current, data) if phase is GET else _retrieve_content(url, current))
-                left, right = random.sample(xrange(256), 2)
+                randint = random.randint(1, 255)
                 for prefix, boolean, suffix in itertools.product(PREFIXES, BOOLEAN_TESTS, SUFFIXES):
                     if not vulnerable:
                         template = "%s%s%s" % (prefix, boolean, suffix)
-                        payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), urllib.quote(template % (left, left if _ else right), safe='%')))) for _ in (True, False))
+                        payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), urllib.quote(template % (randint + 1 if _ else randint, randint), safe='%')))) for _ in (True, False))
                         contents = dict((_, _retrieve_content(payloads[_], data) if phase is GET else _retrieve_content(url, payloads[_])) for _ in (False, True))
                         if all(_[HTTPCODE] for _ in (original, contents[True], contents[False])) and (any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE))):
                             vulnerable = True
                         else:
                             ratios = dict((_, difflib.SequenceMatcher(None, original[TEXT], contents[_][TEXT]).quick_ratio()) for _ in (True, False))
-                            vulnerable = all(ratios) and ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
+                            vulnerable = all(ratios.values()) and ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
                         if vulnerable:
                             print " (i) %s parameter '%s' appears to be blind SQLi vulnerable" % (phase, match.group("parameter"))
                             retval = True
