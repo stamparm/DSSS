@@ -2,7 +2,7 @@
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
 NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)"
-VERSION = "0.2m"
+VERSION = "0.2n"
 AUTHOR  = "Miroslav Stampar (@stamparm)"
 LICENSE = "Public domain (FREE)"
 
@@ -66,7 +66,7 @@ def scan_page(url, data=None):
                             vulnerable = True
                         else:
                             ratios = dict((_, difflib.SequenceMatcher(None, original[TEXT], contents[_][TEXT]).quick_ratio()) for _ in (True, False))
-                            vulnerable = all(ratios.values()) and ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD
+                            vulnerable = all(ratios.values()) and ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD and abs(ratios[True] - ratios[False]) > FUZZY_THRESHOLD / 10
                         if vulnerable:
                             print " (i) %s parameter '%s' appears to be blind SQLi vulnerable" % (phase, match.group("parameter"))
                             retval = True
