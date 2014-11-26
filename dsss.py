@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
-NAME    = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)"
-VERSION = "0.2n"
-AUTHOR  = "Miroslav Stampar (@stamparm)"
-LICENSE = "Public domain (FREE)"
+NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2n", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
 
 PREFIXES = (" ", ") ", "' ", "') ", "\"", "%%' ", "%%') ")              # prefix values used for building testing blind payloads
 SUFFIXES = ("", "-- -", "#", "%%00", "%%16")                            # suffix values used for building testing blind payloads
