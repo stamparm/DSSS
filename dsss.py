@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
-NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2n", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
+NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2o", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
 
 PREFIXES = (" ", ") ", "' ", "') ", "\"", "%%' ", "%%') ")              # prefix values used for building testing blind payloads
 SUFFIXES = ("", "-- -", "#", "%%00", "%%16")                            # suffix values used for building testing blind payloads
@@ -65,7 +65,7 @@ def scan_page(url, data=None):
                             ratios = dict((_, difflib.SequenceMatcher(None, original[TEXT], contents[_][TEXT]).quick_ratio()) for _ in (True, False))
                             vulnerable = all(ratios.values()) and ratios[True] > FUZZY_THRESHOLD and ratios[False] < FUZZY_THRESHOLD and abs(ratios[True] - ratios[False]) > FUZZY_THRESHOLD / 10
                         if vulnerable:
-                            print " (i) %s parameter '%s' appears to be blind SQLi vulnerable" % (phase, match.group("parameter"))
+                            print " (i) %s parameter '%s' appears to be blind SQLi vulnerable (e.g.: '%s')" % (phase, match.group("parameter"), payloads[True])
                             retval = True
         if not usable:
             print " (x) no usable GET/POST parameters found"

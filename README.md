@@ -6,7 +6,7 @@ As of optional settings it supports HTTP proxy together with HTTP header values 
 
 ```
 $ python dsss.py -h
-Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2c
+Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2o
  by: Miroslav Stampar (@stamparm)
 
 Usage: dsss.py [options]
@@ -24,12 +24,12 @@ Options:
 
 ```
 $ python dsss.py -u "http://testphp.vulnweb.com/artists.php?artist=1"
-Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2c
+Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2o
  by: Miroslav Stampar (@stamparm)
 
 * scanning GET parameter 'artist'
  (i) GET parameter 'artist' could be error SQLi vulnerable (MySQL)
- (i) GET parameter 'artist' appears to be blind SQLi vulnerable
+ (i) GET parameter 'artist' appears to be blind SQLi vulnerable (e.g.: 'http://testphp.vulnweb.com/artists.php?artist=1%20AND%2061%3E60')
 
 scan results: possible vulnerabilities found
 ```
