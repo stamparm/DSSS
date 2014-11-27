@@ -42,6 +42,6 @@ scan results: possible vulnerabilities found
 ```
 
 Requirements
-
 ----
+
 Python v2.6 or v2.7 is required for running this program
