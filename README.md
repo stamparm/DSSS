@@ -7,6 +7,9 @@ Damn Small SQLi Scanner
 
 As of optional settings it supports HTTP proxy together with HTTP header values "User-Agent", "Referer" and "Cookie".
 
+Sample runs
+----
+
 ```
 $ python dsss.py -h
 Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2o
@@ -37,4 +40,6 @@ Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2o
 scan results: possible vulnerabilities found
 ```
 
-p.s. Python v2.6 or v2.7 is required for running this program
+Requirements
+----
+Python v2.6 or v2.7 is required for running this program
