@@ -35,11 +35,13 @@ Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2o
 
 * scanning GET parameter 'artist'
  (i) GET parameter 'artist' could be error SQLi vulnerable (MySQL)
- (i) GET parameter 'artist' appears to be blind SQLi vulnerable (e.g.: 'http://testphp.vulnweb.com/artists.php?artist=1%20AND%2061%3E60')
+ (i) GET parameter 'artist' appears to be blind SQLi vulnerable (e.g.: 'http://t
+estphp.vulnweb.com/artists.php?artist=1%20AND%2061%3E60')
 
 scan results: possible vulnerabilities found
 ```
 
 Requirements
+
 ----
 Python v2.6 or v2.7 is required for running this program
