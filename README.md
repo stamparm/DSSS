@@ -1,4 +1,5 @@
-![Logo](https://i.imgur.com/8pg0l5E.png)
+Damn Small SQLi Scanner
+=========
 
 **Damn Small SQLi Scanner** (DSSS) is a fully functional [SQL injection](https://en.wikipedia.org/wiki/SQL_injection) vulnerability scanner (supporting GET and POST parameters) written in under 100 lines of code.
 
