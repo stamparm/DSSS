@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
-NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2r", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
+NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2s", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
 
 PREFIXES = (" ", ") ", "' ", "') ", "%%' ", "%%') ")                            # prefix values used for building testing blind payloads
 SUFFIXES = ("", "-- -", "#", "%%00", "%%16")                                    # suffix values used for building testing blind payloads
@@ -13,6 +13,7 @@ TEXT, HTTPCODE, TITLE, HTML = xrange(4)                                         
 FUZZY_THRESHOLD = 0.95                                                          # ratio value in range (0,1) used for distinguishing True from False responses
 TIMEOUT = 30                                                                    # connection timeout in seconds
 BLOCKED_IP_REGEX = r"(?i)(\A|\b)IP\b.*\b(banned|blocked|block list|firewall)"   # regular expression used for recognition of generic firewall blocking messages
+REFLECTIVE_VALUE_RECOGNITION_REGEX = r"(?i)[^>]*(AND|OR)[^<]*%d[^<]*"           # regular expression used for filtering out reflective values (e.g. payloads in search results)
 
 DBMS_ERRORS = {                                                                 # regular expressions used for DBMS recognition based on error message response
     "MySQL": (r"SQL syntax.*MySQL", r"Warning.*mysql_.*", r"valid MySQL result", r"MySqlClient\."),
@@ -25,7 +26,7 @@ DBMS_ERRORS = {                                                                 
     "Sybase": (r"(?i)Warning.*sybase.*", r"Sybase message", r"Sybase.*Server message.*"),
 }
 
-def _retrieve_content(url, data=None):
+def _retrieve_content(url, data=None, randint=None):
     retval = {HTTPCODE: httplib.OK}
     try:
         req = urllib2.Request("".join(url[_].replace(' ', "%20") if _ > url.find('?') else url[_] for _ in xrange(len(url))), data, globals().get("_headers", {}))
@@ -34,13 +35,14 @@ def _retrieve_content(url, data=None):
         retval[HTTPCODE] = getattr(ex, "code", None)
         retval[HTML] = ex.read() if hasattr(ex, "read") else getattr(ex, "msg", "")
     retval[HTML] = "" if re.search(BLOCKED_IP_REGEX, retval[HTML]) else retval[HTML]
+    retval[HTML] = re.sub(REFLECTIVE_VALUE_RECOGNITION_REGEX % randint, "__REFLECTED__", retval[HTML]) if randint else retval[HTML]
     match = re.search(r"<title>(?P<result>[^<]+)</title>", retval[HTML], re.I)
     retval[TITLE] = match.group("result") if match and "result" in match.groupdict() else None
     retval[TEXT] = re.sub(r"(?si)<script.+?</script>|<!--.+?-->|<style.+?</style>|<[^>]+>|\s+", " ", retval[HTML])
     return retval
 
 def scan_page(url, data=None):
-    retval, usable = False, False
+    retval, usable, randint = False, False, random.randint(1, 255)
     url, data = re.sub(r"=(&|\Z)", "=1\g<1>", url) if url else url, re.sub(r"=(&|\Z)", "=1\g<1>", data) if data else data
     try:
         for phase in (GET, POST):
@@ -56,12 +58,11 @@ def scan_page(url, data=None):
                         print " (i) %s parameter '%s' appears to be error SQLi vulnerable (%s)" % (phase, match.group("parameter"), dbms)
                         retval = vulnerable = True
                 vulnerable = False
-                randint = random.randint(1, 255)
                 for prefix, boolean, suffix in itertools.product(PREFIXES, BOOLEAN_TESTS, SUFFIXES):
                     if not vulnerable:
                         template = "%s%s%s" % (prefix, boolean, suffix)
                         payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), urllib.quote(template % (randint if _ else randint + 1, randint), safe='%')))) for _ in (True, False))
-                        contents = dict((_, _retrieve_content(payloads[_], data) if phase is GET else _retrieve_content(url, payloads[_])) for _ in (False, True))
+                        contents = dict((_, _retrieve_content(payloads[_], data, randint) if phase is GET else _retrieve_content(url, payloads[_], randint)) for _ in (False, True))
                         if all(_[HTTPCODE] for _ in (original, contents[True], contents[False])) and (any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE))):
                             vulnerable = True
                         else:
