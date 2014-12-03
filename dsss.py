@@ -48,7 +48,7 @@ def scan_page(url, data=None):
     try:
         for phase in (GET, POST):
             original, current = None, url if phase is GET else (data or "")
-            for match in re.finditer(r"((\A|[?&])(?P<parameter>\w+)=)(?P<value>[^&]+)", current):
+            for match in re.finditer(r"((\A|[?&])(?P<parameter>[^_]\w*)=)(?P<value>[^&]+)", current):
                 vulnerable, usable = False, True
                 print "* scanning %s parameter '%s'" % (phase, match.group("parameter"))
                 original = original or (_retrieve_content(current, data) if phase is GET else _retrieve_content(url, current))
