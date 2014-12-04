@@ -5,7 +5,7 @@ Damn Small SQLi Scanner
 
 ![Vulnerable](http://i.imgur.com/7mXeXjF.png)
 
-As of optional settings it supports HTTP proxy together with HTTP header values "User-Agent", "Referer" and "Cookie".
+As of optional settings it supports HTTP proxy together with HTTP header values `User-Agent`, `Referer` and `Cookie`.
 
 Sample runs
 ----
