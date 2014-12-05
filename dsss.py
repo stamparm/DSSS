@@ -3,19 +3,19 @@ import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlpa
 
 NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2t", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
 
-PREFIXES = (" ", ") ", "' ", "') ")                                             # prefix values used for building testing blind payloads
-SUFFIXES = ("", "-- -", "#")                                                    # suffix values used for building testing blind payloads
-TAMPER_SQL_CHAR_POOL = ('(', ')', '\'', '"')                                    # characters used for SQL tampering/poisoning of parameter values
-BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d>%d)")                                 # boolean tests used for building testing blind payloads
-COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"                         # optional HTTP header names
-GET, POST = "GET", "POST"                                                       # enumerator-like values used for marking current phase
-TEXT, HTTPCODE, TITLE, HTML = xrange(4)                                         # enumerator-like values used for marking content type
-FUZZY_THRESHOLD = 0.95                                                          # ratio value in range (0,1) used for distinguishing True from False responses
-TIMEOUT = 30                                                                    # connection timeout in seconds
-RANDINT = random.randint(1, 255)                                                # random integer value used across all tests
-BLOCKED_IP_REGEX = r"(?i)(\A|\b)IP\b.*\b(banned|blocked|block list|firewall)"   # regular expression used for recognition of generic firewall blocking messages
+PREFIXES = (" ", ") ", "' ", "') ")                                                 # prefix values used for building testing blind payloads
+SUFFIXES = ("", "-- -", "#")                                                        # suffix values used for building testing blind payloads
+TAMPER_SQL_CHAR_POOL = ('(', ')', '\'', '"')                                        # characters used for SQL tampering/poisoning of parameter values
+BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d>%d)")                                     # boolean tests used for building testing blind payloads
+COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"                             # optional HTTP header names
+GET, POST = "GET", "POST"                                                           # enumerator-like values used for marking current phase
+TEXT, HTTPCODE, TITLE, HTML = xrange(4)                                             # enumerator-like values used for marking content type
+FUZZY_THRESHOLD = 0.95                                                              # ratio value in range (0,1) used for distinguishing True from False responses
+TIMEOUT = 30                                                                        # connection timeout in seconds
+RANDINT = random.randint(1, 255)                                                    # random integer value used across all tests
+BLOCKED_IP_REGEX = r"(?i)(\A|\b)IP\b.*\b(banned|blocked|bl(a|o)ck\s?list|firewall)" # regular expression used for recognition of generic firewall blocking messages
 
-DBMS_ERRORS = {                                                                 # regular expressions used for DBMS recognition based on error message response
+DBMS_ERRORS = {                                                                     # regular expressions used for DBMS recognition based on error message response
     "MySQL": (r"SQL syntax.*MySQL", r"Warning.*mysql_.*", r"valid MySQL result", r"MySqlClient\."),
     "PostgreSQL": (r"PostgreSQL.*ERROR", r"Warning.*\Wpg_.*", r"valid PostgreSQL result", r"Npgsql\."),
     "Microsoft SQL Server": (r"Driver.* SQL[\-\_\ ]*Server", r"OLE DB.* SQL Server", r"(\W|\A)SQL Server.*Driver", r"Warning.*mssql_.*", r"(\W|\A)SQL Server.*[0-9a-fA-F]{8}", r"(?s)Exception.*\WSystem\.Data\.SqlClient\.", r"(?s)Exception.*\WRoadhouse\.Cms\."),
