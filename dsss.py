@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
-NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2v", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
+NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2w", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
 
 PREFIXES = (" ", ") ", "' ", "') ")                                                 # prefix values used for building testing blind payloads
 SUFFIXES = ("", "-- -", "#", "%%16")                                                # suffix values used for building testing blind payloads
@@ -63,7 +63,7 @@ def scan_page(url, data=None):
                         template = ("%s%s%s" % (prefix, boolean, suffix)).replace(" " if inline_comment else "/**/", "/**/")
                         payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), urllib.quote(template % (RANDINT if _ else RANDINT + 1, RANDINT), safe='%')))) for _ in (True, False))
                         contents = dict((_, _retrieve_content(payloads[_], data) if phase is GET else _retrieve_content(url, payloads[_])) for _ in (False, True))
-                        if all(_[HTTPCODE] for _ in (original, contents[True], contents[False])) and (any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE))):
+                        if all(_[HTTPCODE] and _[HTTPCODE] < httplib.INTERNAL_SERVER_ERROR for _ in (original, contents[True], contents[False])) and (any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE))):
                             vulnerable = True
                         else:
                             ratios = dict((_, difflib.SequenceMatcher(None, original[TEXT], contents[_][TEXT]).quick_ratio()) for _ in (False, True))
