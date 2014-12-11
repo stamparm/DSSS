@@ -44,4 +44,4 @@ scan results: possible vulnerabilities found
 Requirements
 ----
 
-[Python](http://www.python.org/download/) version **2.6.x** or **2.7.x** is required for running this program
+[Python](http://www.python.org/download/) version **2.6.x** or **2.7.x** is required for running this program.
