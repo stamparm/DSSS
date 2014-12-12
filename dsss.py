@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
-NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2w", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
+NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2x", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
 
-PREFIXES = (" ", ") ", "' ", "') ")                                                 # prefix values used for building testing blind payloads
-SUFFIXES = ("", "-- -", "#", "%%16")                                                # suffix values used for building testing blind payloads
+PREFIXES, SUFFIXES = (" ", ") ", "' ", "') "), ("", "-- -", "#", "%%16")            # prefix/suffix values used for building testing blind payloads
 TAMPER_SQL_CHAR_POOL = ('(', ')', '\'', '"')                                        # characters used for SQL tampering/poisoning of parameter values
 BOOLEAN_TESTS = ("AND %d=%d", "OR NOT (%d>%d)")                                     # boolean tests used for building testing blind payloads
 COOKIE, UA, REFERER = "Cookie", "User-Agent", "Referer"                             # optional HTTP header names
@@ -63,12 +62,13 @@ def scan_page(url, data=None):
                         template = ("%s%s%s" % (prefix, boolean, suffix)).replace(" " if inline_comment else "/**/", "/**/")
                         payloads = dict((_, current.replace(match.group(0), "%s%s" % (match.group(0), urllib.quote(template % (RANDINT if _ else RANDINT + 1, RANDINT), safe='%')))) for _ in (True, False))
                         contents = dict((_, _retrieve_content(payloads[_], data) if phase is GET else _retrieve_content(url, payloads[_])) for _ in (False, True))
-                        if all(_[HTTPCODE] and _[HTTPCODE] < httplib.INTERNAL_SERVER_ERROR for _ in (original, contents[True], contents[False])) and (any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE))):
-                            vulnerable = True
-                        else:
-                            ratios = dict((_, difflib.SequenceMatcher(None, original[TEXT], contents[_][TEXT]).quick_ratio()) for _ in (False, True))
-                            vulnerable = all(ratios.values()) and min(ratios.values()) < FUZZY_THRESHOLD < max(ratios.values()) and abs(ratios[True] - ratios[False]) > FUZZY_THRESHOLD / 10
-                        if vulnerable and (_retrieve_content(current, data) if phase is GET else _retrieve_content(url, current))[HTTPCODE] == original[HTTPCODE]:
+                        if all(_[HTTPCODE] and _[HTTPCODE] < httplib.INTERNAL_SERVER_ERROR for _ in (original, contents[True], contents[False])):
+                            if any(original[_] == contents[True][_] != contents[False][_] for _ in (HTTPCODE, TITLE)):
+                                vulnerable = True
+                            else:
+                                ratios = dict((_, difflib.SequenceMatcher(None, original[TEXT], contents[_][TEXT]).quick_ratio()) for _ in (False, True))
+                                vulnerable = all(ratios.values()) and min(ratios.values()) < FUZZY_THRESHOLD < max(ratios.values()) and abs(ratios[True] - ratios[False]) > FUZZY_THRESHOLD / 10
+                        if vulnerable:
                             print " (i) %s parameter '%s' appears to be blind SQLi vulnerable (e.g.: '%s')" % (phase, match.group("parameter"), payloads[True])
                             retval = True
         if not usable:
