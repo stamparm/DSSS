@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 import difflib, httplib, itertools, optparse, random, re, urllib, urllib2, urlparse
 
 NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.2y", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
