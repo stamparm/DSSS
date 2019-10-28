@@ -1,4 +1,4 @@
-Damn Small SQLi Scanner [![Python 2.6|2.7](https://img.shields.io/badge/python-2.6|2.7-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-Public_domain-red.svg)](https://wiki.creativecommons.org/wiki/Public_domain)
+Damn Small SQLi Scanner [![Python 3.x](https://img.shields.io/badge/python-3.x-yellow.svg)](https://www.python.org/) [![License](https://img.shields.io/badge/license-Public_domain-red.svg)](https://wiki.creativecommons.org/wiki/Public_domain)
 =========
 
 **Damn Small SQLi Scanner** (DSSS) is a fully functional [SQL injection](https://en.wikipedia.org/wiki/SQL_injection) vulnerability scanner (supporting GET and POST parameters) written in under 100 lines of code.
@@ -11,8 +11,8 @@ Sample runs
 ----
 
 ```
-$ python dsss.py -h
-Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2o
+$ python3 dsss.py -h
+Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.3a
  by: Miroslav Stampar (@stamparm)
 
 Usage: dsss.py [options]
@@ -29,8 +29,8 @@ Options:
 ```
 
 ```
-$ python dsss.py -u "http://testphp.vulnweb.com/artists.php?artist=1"
-Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.2o
+$ python3 dsss.py -u "http://testphp.vulnweb.com/artists.php?artist=1"
+Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.3a
  by: Miroslav Stampar (@stamparm)
 
 * scanning GET parameter 'artist'
@@ -44,4 +44,4 @@ scan results: possible vulnerabilities found
 Requirements
 ----
 
-[Python](http://www.python.org/download/) version **2.6.x** or **2.7.x** is required for running this program.
+[Python](http://www.python.org/download/) version **3.x** is required for running this program.
