@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import difflib, http.client, itertools, optparse, random, re, urllib, urllib.parse, urllib.request
+import difflib, http.client, itertools, optparse, random, re, urllib, urllib.parse, urllib.request  # Python 3 required
 
 NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.3a", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
 
