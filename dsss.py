@@ -33,7 +33,7 @@ def _retrieve_content(url, data=None):
     except Exception as ex:
         retval[HTTPCODE] = getattr(ex, "code", None)
         retval[HTML] = ex.read() if hasattr(ex, "read") else str(ex.args[-1])
-    retval[HTML] = (retval[HTML].decode("utf-8", "ignore") if hasattr(retval[HTML], "decode") else "") or ""
+    retval[HTML] = (retval[HTML].decode("utf8", "ignore") if hasattr(retval[HTML], "decode") else "") or ""
     retval[HTML] = "" if re.search(BLOCKED_IP_REGEX, retval[HTML]) else retval[HTML]
     retval[HTML] = re.sub(r"(?i)[^>]*(AND|OR)[^<]*%d[^<]*" % RANDINT, "__REFLECTED__", retval[HTML])
     match = re.search(r"<title>(?P<result>[^<]+)</title>", retval[HTML], re.I)
