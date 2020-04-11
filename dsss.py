@@ -28,7 +28,7 @@ DBMS_ERRORS = {                                                                 
 def _retrieve_content(url, data=None):
     retval = {HTTPCODE: http.client.OK}
     try:
-        req = urllib.request.Request("".join(url[_].replace(' ', "%20") if _ > url.find('?') else url[_] for _ in range(len(url))), data, globals().get("_headers", {}))
+        req = urllib.request.Request("".join(url[_].replace(' ', "%20") if _ > url.find('?') else url[_] for _ in range(len(url))), data.encode("utf8") if data else data, globals().get("_headers", {}))
         retval[HTML] = urllib.request.urlopen(req, timeout=TIMEOUT).read()
     except Exception as ex:
         retval[HTTPCODE] = getattr(ex, "code", None)
