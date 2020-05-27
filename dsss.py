@@ -44,6 +44,7 @@ def _retrieve_content(url, data=None):
 def scan_page(url, data=None):
     retval, usable = False, False
     url, data = re.sub(r"=(&|\Z)", "=1\g<1>", url) if url else url, re.sub(r"=(&|\Z)", "=1\g<1>", data) if data else data
+    print("--\n* scanning againts %s" % url)
     try:
         for phase in (GET, POST):
             original, current = None, url if phase is GET else (data or "")
@@ -93,8 +94,7 @@ if __name__ == "__main__":
     parser.add_option("--proxy", dest="proxy", help="HTTP proxy address (e.g. \"http://127.0.0.1:8080\")")
     options, _ = parser.parse_args()
     init_options(options.proxy, options.cookie, options.ua, options.referer)
-    target = sys.stdin if not sys.stdin.isatty() else [options.url] if options.url else parser.print_help()
-    if target is None: exit(1)
+    target = sys.stdin if not sys.stdin.isatty() else [options.url] if options.url else exit(parser.print_help())
     for url in target:
         result = scan_page(url if url.startswith("http") else "http://%s" % url, options.data)
         print("\nscan results: %s vulnerabilities found" % ("possible" if result else "no"))
