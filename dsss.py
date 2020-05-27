@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import difflib, http.client, itertools, optparse, random, re, urllib, urllib.parse, urllib.request  # Python 3 required
+import difflib, http.client, itertools, optparse, random, re, sys, urllib, urllib.parse, urllib.request  # Python 3 required
 
 NAME, VERSION, AUTHOR, LICENSE = "Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code)", "0.3b", "Miroslav Stampar (@stamparm)", "Public domain (FREE)"
 
@@ -92,9 +92,9 @@ if __name__ == "__main__":
     parser.add_option("--referer", dest="referer", help="HTTP Referer header value")
     parser.add_option("--proxy", dest="proxy", help="HTTP proxy address (e.g. \"http://127.0.0.1:8080\")")
     options, _ = parser.parse_args()
-    if options.url:
-        init_options(options.proxy, options.cookie, options.ua, options.referer)
-        result = scan_page(options.url if options.url.startswith("http") else "http://%s" % options.url, options.data)
+    init_options(options.proxy, options.cookie, options.ua, options.referer)
+    target = sys.stdin if not sys.stdin.isatty() else [options.url] if options.url else parser.print_help()
+    if target is None: exit(1)
+    for url in target:
+        result = scan_page(url if url.startswith("http") else "http://%s" % url, options.data)
         print("\nscan results: %s vulnerabilities found" % ("possible" if result else "no"))
-    else:
-        parser.print_help()
