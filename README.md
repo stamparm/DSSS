@@ -12,7 +12,7 @@ Sample runs
 
 ```
 $ python3 dsss.py -h
-Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.3a
+Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.4b
  by: Miroslav Stampar (@stamparm)
 
 Usage: dsss.py [options]
@@ -30,13 +30,13 @@ Options:
 
 ```
 $ python3 dsss.py -u "http://testphp.vulnweb.com/artists.php?artist=1"
-Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.3a
+Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.4b
  by: Miroslav Stampar (@stamparm)
 
 * scanning GET parameter 'artist'
- (i) GET parameter 'artist' could be error SQLi vulnerable (MySQL)
+ (i) GET parameter 'artist' appears to be error SQLi vulnerable (MySQL)
  (i) GET parameter 'artist' appears to be blind SQLi vulnerable (e.g.: 'http://t
-estphp.vulnweb.com/artists.php?artist=1%20AND%2061%3E60')
+estphp.vulnweb.com/artists.php?artist=1%20AND%2061%3D61')
 
 scan results: possible vulnerabilities found
 ```
@@ -45,3 +45,44 @@ Requirements
 ----
 
 [Python](http://www.python.org/download/) version **3.x** is required for running this program.
+
+Tests
+----
+
+The test suite lives in `tests/` and needs nothing besides the standard library (plus
+`openssl` for the TLS fixture). It never touches the Internet: `tests/fixture.py` starts
+local HTTP servers backed by a real `sqlite3` database whose queries are built by string
+interpolation, so the injections the scanner finds there are genuine ones. The endpoints
+differ in how they *present* the result - DBMS error message, HTTP status code, `<title>`,
+page size, a firewall block page, a session cookie, a self signed certificate - which is
+exactly what a scanner has to key off.
+
+```
+$ python3 -m unittest discover -s tests -v
+...
+Ran 68 tests in 57.241s
+
+OK
+```
+
+`tests/test_dsss.py` covers the documented behaviour (including the command line
+interface verbatim), `tests/test_regressions.py` holds one test per fixed defect,
+and `tests/test_matrix.py` sweeps every endpoint plus a range of `RANDINT` values.
+`tests/test_mysql.py` repeats the interesting cases against a real MySQL in a
+container - MySQL is the DBMS the payload matrix is aimed at, and the only one where
+`#` is a comment while `--` needs trailing whitespace - and skips itself when docker
+or the image is not already there.
+
+To check that the suite really does pin those fixes, `tests/mutations.py` puts each
+piece of pre-fix code back into a private copy of `dsss.py` and insists that the suite
+notices:
+
+```
+$ python3 tests/mutations.py
+running 24 mutations against the suite
+
+ok   reflection filter: no word boundaries                          FAILED (failures=1) -> test_content_next_to_a_standalone_and
+ok   title tag: no attributes allowed                               FAILED (failures=1) -> test_title_tag_with_attributes
+...
+24/24 mutations caught
+```
