@@ -155,7 +155,7 @@ def main():
     wanted = [_ for _ in MUTATIONS if not sys.argv[1:] or any(re.search(_[0], argument, re.I) or re.search(argument, _[0], re.I) for argument in sys.argv[1:])]
     print("running %d mutations against the suite\n" % len(wanted))
     survivors = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(2, min(4, os.cpu_count() or 2))) as pool:
         for name, caught, detail in pool.map(run, wanted):
             print("%-4s %-62s %s" % ("ok" if caught else "MISS", name, detail))
             if not caught:

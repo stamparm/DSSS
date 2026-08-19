@@ -19,8 +19,8 @@ import http.server
 import os
 import re
 import socket
-import sqlite3
 import shutil
+import sqlite3
 import ssl
 import subprocess
 import tempfile
@@ -127,6 +127,20 @@ class MySQL(object):
 
     def remove(self):
         subprocess.call(("docker", "rm", "-f", self.container), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def tls_available():
+    return bool(shutil.which("openssl"))
+
+
+def ipv6_available():
+    try:
+        sock = socket.socket(socket.AF_INET6)
+        sock.bind(("::1", 0))
+        sock.close()
+        return True
+    except OSError:
+        return False
 
 
 def mysql_available():

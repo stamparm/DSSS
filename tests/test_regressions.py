@@ -256,6 +256,7 @@ class TestTargets(unittest.TestCase):
         dsss.TIMEOUT = 10
         dsss.init_options()
 
+    @unittest.skipUnless(fixture.tls_available(), "openssl not available")
     def test_https_target_with_a_self_signed_certificate(self):
         """Test targets rarely have a certificate a CA would vouch for; refusing to
         talk to them means refusing to scan them."""
@@ -264,6 +265,7 @@ class TestTargets(unittest.TestCase):
             result, output = scan(server, "/blind?id=1")
         self.assertTrue(result, output)
 
+    @unittest.skipUnless(fixture.ipv6_available(), "no IPv6 loopback")
     def test_ipv6_target(self):
         with fixture.server(family=socket.AF_INET6) as server:
             result, output = scan(server, "/blind?id=1")
