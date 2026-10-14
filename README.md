@@ -29,14 +29,12 @@ Options:
 ```
 
 ```
-$ python3 dsss.py -u "http://testphp.vulnweb.com/artists.php?artist=1"
+$ python3 dsss.py -u "https://sekumart.sekuripy.hr/product.php?id=1"
 Damn Small SQLi Scanner (DSSS) < 100 LoC (Lines of Code) #v0.4b
  by: Miroslav Stampar (@stamparm)
 
-* scanning GET parameter 'artist'
- (i) GET parameter 'artist' appears to be error SQLi vulnerable (MySQL)
- (i) GET parameter 'artist' appears to be blind SQLi vulnerable (e.g.: 'http://t
-estphp.vulnweb.com/artists.php?artist=1%20AND%2061%3D61')
+* scanning GET parameter 'id'
+ (i) GET parameter 'id' appears to be blind SQLi vulnerable (e.g.: 'https://sekumart.sekuripy.hr/product.php?id=1%20AND%2069%3D69')
 
 scan results: possible vulnerabilities found
 ```
